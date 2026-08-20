@@ -1,0 +1,24 @@
+{
+  "name": "gitstar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0Isabella/GitStar.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+"type": "module",  "bugs": {
+    "url": "https://github.com/0Isabella/GitStar/issues"
+  },
+  "homepage": "https://github.com/0Isabella/GitStar#readme",
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
+  }
+}
