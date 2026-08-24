@@ -1,104 +1,87 @@
 import { writeFileSync } from "node:fs";
+import {createContributionGraph, generateFakeContributions} from './graph.js'
+import { createStarAnimation } from "./animation.js";
 
-function createContributionRect(row: number ,column: number, level: number): string {
-    const size = 10;
-    const gap = 3;
-    let color = "#edebf0";
-        if (level === 1) {
-            color = "#c4b5fd";
-        }
+function createBackground(): string {
+    return `
+        <defs>
+            <linearGradient
+                id="spaceGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+            >
+                <stop
+                    offset="0%"
+                    stop-color="#090b1f"
+                />
 
-        if (level === 2) {
-            color = "#8b5cf6";
-        }
+                <stop
+                    offset="50%"
+                    stop-color="#17113b"
+                />
 
-        if (level === 3) {
-            color = "#6d28d9";
-        }
+                <stop
+                    offset="100%"
+                    stop-color="#090b1f"
+                />
+            </linearGradient>
+        </defs>
 
-        if (level >= 4) {
-            color = "#4c1d95";
-        }
-    const posX = column * (size + gap);
-    const posY = row * (size + gap);
-
-    return `<rect x = "${posX}" y = "${posY}" width = "${size}" height = "${size}" fill = "${color}"/>`;
+        <rect
+            width="720"
+            height="130"
+            fill="url(#spaceGradient)"
+        />
+    `;
 }
 
-function createContributionGraph(contributions: number[][]): string {
+function createBackgroundStars(): string {
+    const stars: string[] = [];
 
-    const rects: string[] = [];
+    for (let i = 0; i < 150; i++) {
+        const x = Math.random() * 720;
+        const y = Math.random() * 130;
+        const radius = Math.random() * 1.2 + 0.3;
 
-    for (let row = 0; row < contributions.length; row++) {
-
-        const currentRow = contributions[row];
-
-        if (!currentRow) {
-            continue;
-        }
-
-        for (let column = 0; column < currentRow.length; column++) {
-
-            const level = currentRow[column];
-
-            if (level === undefined) {
-                continue;
-            }
-
-            const rect = createContributionRect(
-                row,
-                column,
-                level
-            );
-
-            rects.push(rect);
-        }
+        stars.push(`
+            <circle
+                cx="${x}"
+                cy="${y}"
+                r="${radius}"
+                fill="#ffffff"
+                opacity="${Math.random() * 0.7 + 0.3}"
+            />
+        `);
     }
 
-    return rects.join("\n");
-}
-
-function generateFakeContributions(): number[][] {
-
-    const contributions: number[][] = [];
-
-    for (let row = 0; row < 7; row++) {
-
-        const rowData: number[] = [];
-
-        for (let column = 0; column < 52; column++) {
-
-            const level = Math.floor(Math.random() * 5) 
-
-            rowData.push(level);
-            }
-
-        contributions.push(rowData);
-    }
-    return contributions;
+    return stars.join("\n");
 }
 
 function main(): void {
 
     const contributions = generateFakeContributions();
 
-console.log(contributions);
+    console.log(contributions);
 
     const graph = createContributionGraph(contributions);
+
+    const animation = createStarAnimation();
 
     const svg = `
     <svg
         xmlns="http://www.w3.org/2000/svg"
         width="720"
         height="130"
-    >
-        <rect
-            width="720"
-            height="130"
-            fill="#0b1026"
-        />
+        >
 
-        ${graph}
+        ${createBackground()}
+        ${createBackgroundStars()}
+        <g transform="translate(22, 19.5)"> 
+            ${graph} 
+            ${animation}
+        </g>
     </svg>
     `;
 
