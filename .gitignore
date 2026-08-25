@@ -1,6 +1,9 @@
 # Dependências
 node_modules/
 
+# Arquivo para guardar token do github
+.env
+
 # Arquivos gerados pelo TypeScript
 *.js
 *.js.map

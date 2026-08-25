@@ -1,5 +1,6 @@
 import { writeFileSync } from "node:fs";
-import {createContributionGraph, generateFakeContributions} from './graph.js'
+import { createContributionGraph } from "./graph.js";
+import { getGithubContributions } from "./github.js";
 import { createStarAnimation } from "./animation.js";
 
 function createBackground(): string {
@@ -59,9 +60,9 @@ function createBackgroundStars(): string {
     return stars.join("\n");
 }
 
-function main(): void {
+async function main(): Promise<void> {
 
-    const contributions = generateFakeContributions();
+    const contributions = await getGithubContributions();
 
     console.log(contributions);
 

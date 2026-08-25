@@ -13,12 +13,16 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-"type": "module",  "bugs": {
+  "type": "module",
+  "bugs": {
     "url": "https://github.com/0Isabella/GitStar/issues"
   },
   "homepage": "https://github.com/0Isabella/GitStar#readme",
   "devDependencies": {
     "@types/node": "^26.2.0",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   }
 }
