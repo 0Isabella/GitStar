@@ -103,7 +103,6 @@ function createAnimation(
             keyTimes="${keyTimes}"
             dur="${duration}s"
             begin="${begin}s"
-            fill="freeze"
         />
     `;
 
@@ -123,27 +122,58 @@ function createGlowFilter(): string {
 }
 
 export function createStarAnimation(): string {
-    const numberOfPaths = 20;
+    const numberOfPaths = 200;
     const pointsPerPath = 12;
 
-    const animations: string[] = [];
-    let currentTime = 0;
-    let lastPosition = getRandomPosition();
+    const firstPosition = getRandomPosition();
+    let lastPosition = firstPosition;
+
+    const allPositions: Position[] = [firstPosition];
 
     for (let i = 0; i < numberOfPaths; i++) {
         const path = createPath(pointsPerPath, lastPosition);
-        const animation = createAnimation(i, path, currentTime);
 
-        animations.push(animation.svg);
-        currentTime += animation.duration;
+        for (let j = 1; j < path.length; j++) {
+            allPositions.push(path[j]!);
+        }
+
         lastPosition = path[path.length - 1]!;
     }
 
-    return `
-    <g>
-        <defs>${createGlowFilter()}</defs>
-        <polygon points="${STAR_POLYGON_POINTS}" fill="#ffe600" filter="url(#starGlow)" />
-        ${animations.join("\n")}
-    </g>
+    allPositions.push(firstPosition);
+
+    const translateValues = allPositions
+        .map((position) => {
+            const { x, y } = positionToPoint(position);
+            return `${x},${y}`;
+        })
+        .join(";");
+
+    const { totalDistance, keyTimes } = analyzePath(allPositions);
+
+    const duration = totalDistance / STAR_SPEED;
+
+    const svg = `
+        <g>
+            <defs>${createGlowFilter()}</defs>
+
+            <polygon
+                points="${STAR_POLYGON_POINTS}"
+                fill="#ffe600"
+                filter="url(#starGlow)"
+            />
+
+            <animateTransform
+                id="star-translate"
+                attributeName="transform"
+                type="translate"
+                values="${translateValues}"
+                keyTimes="${keyTimes}"
+                dur="${duration}s"
+                repeatCount="indefinite"
+                calcMode="linear"
+            />
+        </g>
     `;
+    return svg;
 }
