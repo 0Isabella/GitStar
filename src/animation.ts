@@ -5,9 +5,17 @@ const ROWS = 7;
 const COLUMNS = 52;
 const STAR_SPEED = 60;
 
+const STAR_POLYGON_POINTS =
+    "0,-6 1.8,-2 6,-2 3,0.8 4,5 0,2.5 -4,5 -3,0.8 -6,-2 -1.8,-2";
+
 type Position = {
     row: number;
     column: number;
+};
+
+type Point = {
+    x: number;
+    y: number;
 };
 
 function getRandomPosition(): Position {
@@ -17,34 +25,19 @@ function getRandomPosition(): Position {
     };
 }
 
-function getRandomPositionNear(
-    position: Position
-): Position {
+function getRandomPositionNear(position: Position): Position {
+    const MIN_DISTANCE = 3;
+    const MAX_DISTANCE = 12;
 
     let newPosition: Position;
     let distance: number;
 
-    const MIN_DISTANCE = 3;
-    const MAX_DISTANCE = 12;
-
     do {
         newPosition = getRandomPosition();
-
-        const deltaRow =
-            newPosition.row - position.row;
-
-        const deltaColumn =
-            newPosition.column - position.column;
-
-        distance = Math.sqrt(
-            deltaRow ** 2 +
-            deltaColumn ** 2
-        );
-
-    } while (
-        distance < MIN_DISTANCE ||
-        distance > MAX_DISTANCE
-    );
+        const deltaRow = newPosition.row - position.row;
+        const deltaColumn = newPosition.column - position.column;
+        distance = Math.sqrt(deltaRow ** 2 + deltaColumn ** 2);
+    } while (distance < MIN_DISTANCE || distance > MAX_DISTANCE);
 
     return newPosition;
 }
@@ -59,103 +52,47 @@ function createPath(numberOfPoints: number, startPosition: Position): Position[]
     return path;
 }
 
-function calculatePathDistance(path: Position[]): number {
-    let distance = 0;
-
-    for (let i = 1; i < path.length; i++) {
-        const previous = path[i - 1];
-        const current = path[i];
-
-        if (!previous || !current) {
-            continue;
-        }
-
-        const previousX =
-            previous.column * STEP + CELL_SIZE / 2;
-
-        const previousY =
-            previous.row * STEP + CELL_SIZE / 2;
-
-        const currentX =
-            current.column * STEP + CELL_SIZE / 2;
-
-        const currentY =
-            current.row * STEP + CELL_SIZE / 2;
-
-        const deltaX = currentX - previousX;
-        const deltaY = currentY - previousY;
-
-        distance += Math.sqrt(
-            deltaX ** 2 + deltaY ** 2
-        );
-    }
-
-    return distance;
+function positionToPoint(position: Position): Point {
+    return {
+        x: position.column * STEP + CELL_SIZE / 2,
+        y: position.row * STEP + CELL_SIZE / 2
+    };
 }
 
-function calculateKeyTimes(path: Position[]): string {
-    const distances: number[] = [0];
-
+function analyzePath(path: Position[]): { totalDistance: number; keyTimes: string } {
+    const points = path.map(positionToPoint);
+    const cumulative: number[] = [0];
     let totalDistance = 0;
 
-    for (let i = 1; i < path.length; i++) {
-        const previous = path[i - 1];
-        const current = path[i];
-
-        if (!previous || !current) {
-            continue;
-        }
-
-        const previousX =
-            previous.column * STEP + CELL_SIZE / 2;
-
-        const previousY =
-            previous.row * STEP + CELL_SIZE / 2;
-
-        const currentX =
-            current.column * STEP + CELL_SIZE / 2;
-
-        const currentY =
-            current.row * STEP + CELL_SIZE / 2;
-
-        const deltaX = currentX - previousX;
-        const deltaY = currentY - previousY;
-
-        const segmentDistance = Math.sqrt(
-            deltaX ** 2 + deltaY ** 2
-        );
-
-        totalDistance += segmentDistance;
-
-        distances.push(totalDistance);
+    for (let i = 1; i < points.length; i++) {
+        const deltaX = points[i]!.x - points[i - 1]!.x;
+        const deltaY = points[i]!.y - points[i - 1]!.y;
+        totalDistance += Math.sqrt(deltaX ** 2 + deltaY ** 2);
+        cumulative.push(totalDistance);
     }
 
-    if (totalDistance === 0) {
-        return path.map(() => "0").join(";");
-    }
+    const keyTimes =
+        totalDistance === 0
+            ? path.map(() => "0").join(";")
+            : cumulative.map((d) => d / totalDistance).join(";");
 
-    return distances
-        .map((distance) => distance / totalDistance)
-        .join(";");
+    return { totalDistance, keyTimes };
 }
 
-function createAnimation(id: number, path: Position[], begin: number): 
-    {
-    svg: string; duration: number;} 
-    {
-    const distance = calculatePathDistance(path);
-
-    const duration = distance / STAR_SPEED;
+function createAnimation(
+    id: number,
+    path: Position[],
+    begin: number
+): { svg: string; duration: number } {
+    const { totalDistance, keyTimes } = analyzePath(path);
+    const duration = totalDistance / STAR_SPEED;
 
     const translateValues = path
         .map((position) => {
-            const x = position.column * STEP + CELL_SIZE / 2;
-            const y = position.row * STEP + CELL_SIZE / 2;
+            const { x, y } = positionToPoint(position);
             return `${x},${y}`;
         })
         .join(";");
-
-    const keyTimes = calculateKeyTimes(path);
 
     const svg = `
         <animateTransform
@@ -170,36 +107,18 @@ function createAnimation(id: number, path: Position[], begin: number):
         />
     `;
 
-    return {svg, duration};
+    return { svg, duration };
 }
 
-function createGlow(): string {
+function createGlowFilter(): string {
     return `
-        <defs>
-            <filter
-                id="starGlow"
-                x="-100%"
-                y="-100%"
-                width="300%"
-                height="300%"
-            >
-                <feGaussianBlur
-                    stdDeviation="3"
-                    result="blur"
-                />
-
-                <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                </feMerge>
-            </filter>
-        </defs>
-
-        <polygon
-            points="0,-6 1.8,-2 6,-2 3,0.8 4,5 0,2.5 -4,5 -3,0.8 -6,-2 -1.8,-2"
-            fill="#ffe600"
-            filter="url(#starGlow)"
-        />
+        <filter id="starGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
     `;
 }
 
@@ -209,25 +128,22 @@ export function createStarAnimation(): string {
 
     const animations: string[] = [];
     let currentTime = 0;
-    let lastPosition = getRandomPosition(); 
+    let lastPosition = getRandomPosition();
 
     for (let i = 0; i < numberOfPaths; i++) {
-        const path = createPath(pointsPerPath, lastPosition); 
+        const path = createPath(pointsPerPath, lastPosition);
         const animation = createAnimation(i, path, currentTime);
 
         animations.push(animation.svg);
         currentTime += animation.duration;
-        lastPosition = path[path.length - 1]!; 
+        lastPosition = path[path.length - 1]!;
     }
 
     return `
     <g>
-        ${createGlow()}
-        <polygon
-            points="0,-6 1.8,-2 6,-2 3,0.8 4,5 0,2.5 -4,5 -3,0.8 -6,-2 -1.8,-2"
-            fill="#ffe600"
-        />
-            ${animations.join("\n")}
-        </g>    
+        <defs>${createGlowFilter()}</defs>
+        <polygon points="${STAR_POLYGON_POINTS}" fill="#ffe600" filter="url(#starGlow)" />
+        ${animations.join("\n")}
+    </g>
     `;
 }

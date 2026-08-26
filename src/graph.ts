@@ -1,75 +1,41 @@
-export function createContributionRect(row: number ,column: number, level: number): string {
-    const size = 10;
-    const gap = 3;
-    let color = "#edebf0";
-        if (level === 1) {
-            color = "#c4b5fd";
-        }
+const SIZE = 10;
+const GAP = 3;
 
-        if (level === 2) {
-            color = "#8b5cf6";
-        }
+const LEVEL_COLORS = [
+    "#a274e723",
+    "#c4b5fd",
+    "#8b5cf6",
+    "#6d28d9",
+    "#4c1d95"
+];
 
-        if (level === 3) {
-            color = "#6d28d9";
-        }
+function getColorForLevel(level: number): string {
+    const index = Math.min(level, LEVEL_COLORS.length - 1);
+    return LEVEL_COLORS[index]!;
+}
 
-        if (level >= 4) {
-            color = "#4c1d95";
-        }
-    const posX = column * (size + gap);
-    const posY = row * (size + gap);
+export function createContributionRect(row: number, column: number, level: number): string {
+    const color = getColorForLevel(level);
+    const posX = column * (SIZE + GAP);
+    const posY = row * (SIZE + GAP);
 
-    return `<rect x = "${posX}" y = "${posY}" width = "${size}" height = "${size}" fill = "${color}"/>`;
+    return `<rect x="${posX}" y="${posY}" width="${SIZE}" height="${SIZE}" fill="${color}"/>`;
 }
 
 export function createContributionGraph(contributions: number[][]): string {
-
     const rects: string[] = [];
 
     for (let row = 0; row < contributions.length; row++) {
-
         const currentRow = contributions[row];
-
-        if (!currentRow) {
-            continue;
-        }
+        if (!currentRow) continue;
 
         for (let column = 0; column < currentRow.length; column++) {
-
             const level = currentRow[column];
+            if (level === undefined) continue;
 
-            if (level === undefined) {
-                continue;
-            }
-
-            const rect = createContributionRect(
-                row,
-                column,
-                level
-            );
-
-            rects.push(rect);
+            rects.push(createContributionRect(row, column, level));
         }
     }
 
     return rects.join("\n");
-}
-
-export function generateFakeContributions(): number[][] {
-
-    const contributions: number[][] = [];
-
-    for (let row = 0; row < 7; row++) {
-        const rowData: number[] = [];
-
-        for (let column = 0; column < 52; column++) {
-            const level = Math.floor(Math.random() * 5) 
-
-            rowData.push(level);
-            }
-
-        contributions.push(rowData);
-    }
-    return contributions;
 }
