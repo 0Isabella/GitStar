@@ -9,6 +9,32 @@ const LEVEL_COLORS = [
     "#4c1d95"
 ];
 
+const MONTH_NAMES = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Set", "Oct", "Nov", "Dec"
+];
+
+export function createMonthLabels(weekDates: string[]): string {
+    const labels: string[] = [];
+    let lastMonth = -1;
+
+    for (let column = 0; column < weekDates.length; column++) {
+        const dateStr = weekDates[column];
+        if (!dateStr) continue;
+
+        const month = new Date(dateStr).getUTCMonth();
+
+        if (month !== lastMonth) {
+            const posX = column * (SIZE + GAP);
+            labels.push(
+                `<text x="${posX}" y="0" font-size="10" fill="#c4b5fd" font-family="sans-serif">${MONTH_NAMES[month]}</text>`
+            );
+            lastMonth = month;
+        }
+    }
+
+    return labels.join("\n");
+}
+
 function getColorForLevel(level: number): string {
     const index = Math.min(level, LEVEL_COLORS.length - 1);
     return LEVEL_COLORS[index]!;

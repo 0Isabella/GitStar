@@ -1,10 +1,10 @@
 import { writeFileSync } from "node:fs";
-import { createContributionGraph } from "./graph.js";
+import { createContributionGraph, createMonthLabels } from "./graph.js";
 import { getGithubContributions } from "./github.js";
 import { createStarAnimation } from "./animation.js";
 
 const WIDTH = 720;
-const HEIGHT = 130;
+const HEIGHT = 145;
 
 function createBackground(): string {
     return `
@@ -38,25 +38,33 @@ function createBackgroundStars(): string {
 }
 
 async function main(): Promise<string> {
-    const contributions = await getGithubContributions();
+    const { contributions, weekDates } = await getGithubContributions();
 
     const graph = createContributionGraph(contributions);
+    const monthLabels = createMonthLabels(weekDates);
     const animation = createStarAnimation();
 
     console.log("-=-⋆-=-⋆ ✧ ⋆-=-⋆-=-");
     console.log("⋮ GitStar's ready! ⋮");
     console.log("-=-⋆-=-⋆ ✧ ⋆-=-⋆-=-");
 
-    return`
+    const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}">
         ${createBackground()}
         ${createBackgroundStars()}
-        <g transform="translate(18, 25)">
+        <g transform="translate(17, 20)">
+            ${monthLabels}
+        </g>
+        <g transform="translate(17, 35)">
             ${graph}
             ${animation}
         </g>
     </svg>
-    `;  
+    `;
+    
+    writeFileSync("gitstar.svg", svg);
+
+    return svg;
 }
 
 main().catch((error) => {

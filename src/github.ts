@@ -24,10 +24,13 @@ interface GitHubResponse {
     };
 }
 
-export async function getGithubContributions(): Promise<number[][]> {
+export async function getGithubContributions(): Promise<{
+    contributions: number[][];
+    weekDates: string[];
+}> {
+
     const token = process.env.GITHUB_TOKEN;
     const username = process.env.GITHUB_USERNAME;
-
 
     if (!token) {
         throw new Error("GITHUB_TOKEN não encontrado no .env");
@@ -85,7 +88,13 @@ export async function getGithubContributions(): Promise<number[][]> {
         )
     );
 
-    return Array.from({ length: 7 }, (_, dayIndex) =>
+    const weekDates = calendar.weeks.map(
+        week => week.contributionDays[0]?.date ?? ""
+    );
+
+    const contributions = Array.from({ length: 7 }, (_, dayIndex) =>
         weeks.map(week => week[dayIndex] ?? 0)
     );
+
+    return { contributions, weekDates };
 }
