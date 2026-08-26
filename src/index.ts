@@ -5,7 +5,6 @@ import { createStarAnimation } from "./animation.js";
 
 const WIDTH = 720;
 const HEIGHT = 130;
-const OUTPUT_PATH = "output/gitstar.svg";
 
 function createBackground(): string {
     return `
@@ -38,13 +37,17 @@ function createBackgroundStars(): string {
     return stars.join("\n");
 }
 
-async function main(): Promise<void> {
+async function main(): Promise<string> {
     const contributions = await getGithubContributions();
 
     const graph = createContributionGraph(contributions);
     const animation = createStarAnimation();
 
-    const svg = `
+    console.log("-=-⋆-=-⋆ ✧ ⋆-=-⋆-=-");
+    console.log("⋮ GitStar's ready! ⋮");
+    console.log("-=-⋆-=-⋆ ✧ ⋆-=-⋆-=-");
+
+    return`
     <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}">
         ${createBackground()}
         ${createBackgroundStars()}
@@ -53,11 +56,7 @@ async function main(): Promise<void> {
             ${animation}
         </g>
     </svg>
-    `;
-
-    writeFileSync(OUTPUT_PATH, svg);
-
-    console.log("⭐ GitStar criado!");
+    `;  
 }
 
 main().catch((error) => {

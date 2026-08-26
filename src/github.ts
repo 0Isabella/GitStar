@@ -79,8 +79,6 @@ export async function getGithubContributions(): Promise<number[][]> {
     const calendar =
         result.data.user.contributionsCollection.contributionCalendar;
 
-    console.log(`Total de contribuições: ${calendar.totalContributions}`);
-
     const weeks = calendar.weeks.map(
         week => week.contributionDays.map(
             day => day.contributionCount
