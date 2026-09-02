@@ -14,6 +14,14 @@ function createBackground(): string {
                 <stop offset="50%" stop-color="#17113b" />
                 <stop offset="100%" stop-color="#090b1f" />
             </linearGradient>
+
+            <filter id="cellGlow" x="-150%" y="-150%" width="400%" height="400%">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
         </defs>
 
         <rect width="${WIDTH}" height="${HEIGHT}" fill="url(#spaceGradient)" />
@@ -40,9 +48,9 @@ function createBackgroundStars(): string {
 async function main(): Promise<string> {
     const { contributions, weekDates } = await getGithubContributions();
 
-    const graph = createContributionGraph(contributions);
+    const { svg: animation, duration, cellHits } = createStarAnimation();
+    const graph = createContributionGraph(contributions, cellHits, duration);
     const monthLabels = createMonthLabels(weekDates);
-    const animation = createStarAnimation();
 
     console.log("-=-⋆-=-⋆ ✧ ⋆-=-⋆-=-");
     console.log("⋮ GitStar's ready! ⋮");

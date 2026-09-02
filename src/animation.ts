@@ -59,7 +59,11 @@ function positionToPoint(position: Position): Point {
     };
 }
 
-function analyzePath(path: Position[]): { totalDistance: number; keyTimes: string } {
+function analyzePath(path: Position[]): {
+    totalDistance: number;
+    keyTimes: string;
+    keyTimesArray: number[];
+} {
     const points = path.map(positionToPoint);
     const cumulative: number[] = [0];
     let totalDistance = 0;
@@ -71,12 +75,33 @@ function analyzePath(path: Position[]): { totalDistance: number; keyTimes: strin
         cumulative.push(totalDistance);
     }
 
-    const keyTimes =
+    const keyTimesArray =
         totalDistance === 0
-            ? path.map(() => "0").join(";")
-            : cumulative.map((d) => d / totalDistance).join(";");
+            ? path.map(() => 0)
+            : cumulative.map((d) => d / totalDistance);
 
-    return { totalDistance, keyTimes };
+    const keyTimes = keyTimesArray.join(";");
+
+    return { totalDistance, keyTimes, keyTimesArray };
+}
+
+function buildCellHits(positions: Position[], times: number[]): Map<string, number[]> {
+    const hits = new Map<string, number[]>();
+
+    for (let i = 0; i < positions.length; i++) {
+        const position = positions[i]!;
+        const time = times[i]!;
+        const key = `${position.row}-${position.column}`;
+
+        const existing = hits.get(key);
+        if (existing) {
+            existing.push(time);
+        } else {
+            hits.set(key, [time]);
+        }
+    }
+
+    return hits;
 }
 
 function createAnimation(
@@ -121,7 +146,13 @@ function createGlowFilter(): string {
     `;
 }
 
-export function createStarAnimation(): string {
+export type StarAnimationResult = {
+    svg: string;
+    duration: number;
+    cellHits: Map<string, number[]>;
+};
+
+export function createStarAnimation(): StarAnimationResult {
     const numberOfPaths = 200;
     const pointsPerPath = 12;
 
@@ -149,9 +180,10 @@ export function createStarAnimation(): string {
         })
         .join(";");
 
-    const { totalDistance, keyTimes } = analyzePath(allPositions);
+    const { totalDistance, keyTimes, keyTimesArray } = analyzePath(allPositions);
 
     const duration = totalDistance / STAR_SPEED;
+    const cellHits = buildCellHits(allPositions, keyTimesArray);
 
     const svg = `
         <g>
@@ -159,7 +191,7 @@ export function createStarAnimation(): string {
 
             <polygon
                 points="${STAR_POLYGON_POINTS}"
-                fill="#ffe600"
+                fill="#ffb700"
                 filter="url(#starGlow)"
             />
 
@@ -175,5 +207,5 @@ export function createStarAnimation(): string {
             />
         </g>
     `;
-    return svg;
+    return { svg, duration, cellHits };
 }
