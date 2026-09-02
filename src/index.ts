@@ -37,8 +37,13 @@ function createBackgroundStars(): string {
         const radius = Math.random() * 1.2 + 0.3;
         const opacity = Math.random() * 0.7 + 0.3;
 
+        const duration = Math.random() * 2 + 1;
+        const delay = Math.random() * 3;
+
         stars.push(
-            `<circle cx="${x}" cy="${y}" r="${radius}" fill="#ffffff" opacity="${opacity}" />`
+            `<circle cx="${x}" cy="${y}" r="${radius}" fill="#ffffff" opacity="${opacity}">
+            <animate attributeName="opacity" values="${opacity};${opacity * 0.2};${opacity}" dur="${duration}s" begin="${delay}s" repeatCount="indefinite"/>
+            </circle>`
         );
     }
 

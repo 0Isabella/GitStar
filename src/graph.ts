@@ -9,7 +9,7 @@ const LEVEL_COLORS = [
     "#4c1d95"
 ];
 
-const FLASH_COLOR = "#ffe600";
+const FLASH_COLOR = "#ffe600aa";
 const FLASH_HALF_DURATION = 0.5;
 const MIN_KEYFRAME_GAP = 0.001;
 const CELL_GLOW_ID = "cellGlow";
