@@ -191,7 +191,7 @@ export function createStarAnimation(): StarAnimationResult {
 
             <polygon
                 points="${STAR_POLYGON_POINTS}"
-                fill="#ffb700"
+                fill="#ffe600"
                 filter="url(#starGlow)"
             />
 
