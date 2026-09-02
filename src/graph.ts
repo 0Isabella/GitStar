@@ -29,7 +29,11 @@ export function createMonthLabels(weekDates: string[]): string {
 
         const month = new Date(dateStr).getUTCMonth();
 
-        if (month !== lastMonth) {
+        if (column === 0 && month !== new Date(weekDates[1]!).getUTCMonth()) {
+            continue;
+        }
+
+        if (month !== lastMonth && column !== 0) {
             const posX = column * (SIZE + GAP);
             labels.push(
                 `<text x="${posX}" y="0" font-size="10" fill="#c4b5fd" font-family="sans-serif">${MONTH_NAMES[month]}</text>`
