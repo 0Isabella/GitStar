@@ -75,7 +75,7 @@ async function main(): Promise<string> {
     </svg>
     `;
     
-    writeFileSync("gitstar.svg", svg);
+    writeFileSync("output/gitstar.svg", svg);
 
     return svg;
 }
