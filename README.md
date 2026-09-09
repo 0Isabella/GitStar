@@ -85,6 +85,24 @@ npm start
 </p>
 ```
 
+## 𝑨𝒖𝒕𝒐𝒎𝒂𝒕𝒊𝒄 𝑫𝒂𝒊𝒍𝒚 𝑼𝒑𝒅𝒂𝒕𝒆𝒔 (𝑮𝒊𝒕𝑯𝒖𝒃 𝑨𝒄𝒕𝒊𝒐𝒏𝒔)
+
+✧ GitStar can regenerate the SVG automatically every day using GitHub Actions, so you don't need to run it manually.
+
+✧ If you forked or cloned this repository and want your own graph to update automatically, follow these steps:
+
+### ✦ 𝑨𝒅𝒅 𝒚𝒐𝒖𝒓 𝒕𝒐𝒌𝒆𝒏 𝒂𝒔 𝒂 𝒓𝒆𝒑𝒐𝒔𝒊𝒕𝒐𝒓𝒚 𝒔𝒆𝒄𝒓𝒆𝒕
+
+✧ In **your** repository, go to Settings → Secrets and variables → Actions
+
+✧ Click New repository secret
+
+✧ Name: `GH_PAT` - Value: the token you just generated
+
+✧ **Secrets are per-repository**, they are not included when someone forks or clones your repo, so each person needs to add their own.
+
+✧ The included workflow (`.github/workflows/update.yml`) will pick up your secret automatically and run on the defined schedule.
+
 ## 𝑩𝒖𝒊𝒍𝒅 𝑾𝒊𝒕𝒉
 
 ✧ TypeScript
@@ -106,6 +124,8 @@ GitStar
 │   ├── github.ts
 │   ├── graph.ts
 │   └── index.ts
+├── worlflow/
+│   ├── update.yml
 ├── .gitignore
 ├── package-lock.json
 ├── package.json
