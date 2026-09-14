@@ -124,7 +124,7 @@ GitStar
 │   ├── github.ts
 │   ├── graph.ts
 │   └── index.ts
-├── worlflow/
+├── .github/worlflow/
 │   ├── update.yml
 ├── .gitignore
 ├── package-lock.json
